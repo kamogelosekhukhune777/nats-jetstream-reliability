@@ -3,14 +3,21 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/kamogelosekhukhune777/nats-jetstream-reliability/internal/idempotency"
+	"github.com/kamogelosekhukhune777/nats-jetstream-reliability/internal/metrics"
 	"github.com/kamogelosekhukhune777/nats-jetstream-reliability/internal/workerpool"
 	"github.com/nats-io/nats.go"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
+	metrics.Register()
+	http.Handle("/metrics", promhttp.Handler())
+	go http.ListenAndServe(":2112", nil)
+
 	if err := run(); err != nil {
 		log.Fatal(err)
 	}
